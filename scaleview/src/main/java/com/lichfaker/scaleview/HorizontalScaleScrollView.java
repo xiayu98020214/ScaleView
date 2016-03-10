@@ -1,14 +1,13 @@
 package com.lichfaker.scaleview;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Build;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,18 +21,30 @@ import android.widget.Scroller;
  */
 public class HorizontalScaleScrollView extends View {
 
-    private int mMax = 200; //最大刻度
-    private int mMin = 0; // 最小刻度
+    private static final int[] mAttr = {
+            R.attr.scale_view_min,
+            R.attr.scale_view_max,
+            R.attr.scale_view_margin,
+            R.attr.scale_view_height,
+    };
+
+    public static final int SCALE_MIN = 0;
+    public static final int SCALE_MAX = 1;
+    public static final int SCALE_MARGIN = 2;
+    public static final int SCALE_HEIGHT = 3;
+
+    private int mMax; //最大刻度
+    private int mMin; // 最小刻度
     private int mCountScale; //滑动的总刻度
 
-    private int mScreenWidth; //默认屏幕分辨率
+    private int mScaleScrollViewWidth;
 
-    private int mScaleMargin = 15; //刻度间距
-    private int mScaleHeight = 20; //刻度线的高度
-    private int mScaleMaxHeight = mScaleHeight * 2; //整刻度线高度
+    private int mScaleMargin; //刻度间距
+    private int mScaleHeight; //刻度线的高度
+    private int mScaleMaxHeight; //整刻度线高度
 
-    private int mRectWidth = mMax * mScaleMargin; //总宽度
-    private int mRectHeight = 150; //高度
+    private int mRectWidth; //总宽度
+    private int mRectHeight; //高度
 
     private Scroller mScroller;
     private int mScrollLastX;
@@ -49,36 +60,56 @@ public class HorizontalScaleScrollView extends View {
 
     public HorizontalScaleScrollView(Context context) {
         super(context);
-        init();
+        init(null);
     }
 
     public HorizontalScaleScrollView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init();
+        init(attrs);
     }
 
     public HorizontalScaleScrollView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
+        init(attrs);
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public HorizontalScaleScrollView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        init();
+        init(attrs);
     }
 
     /**
      * 初始化方法
      */
-    private void init() {
-        mScreenWidth = getPhoneWidth();
-        mTempScale = mScreenWidth / mScaleMargin / 2;
-        mMidCountScale = mScreenWidth / mScaleMargin / 2;
+    private void init(AttributeSet attrs) {
+
+        // 获取自定义属性
+        TypedArray ta = getContext().obtainStyledAttributes(attrs, mAttr);
+        mMin = ta.getInteger(SCALE_MIN, 0);
+        mMax = ta.getInteger(SCALE_MAX, 200);
+        mScaleMargin = ta.getDimensionPixelOffset(SCALE_MARGIN, 15);
+        mScaleHeight = ta.getDimensionPixelOffset(SCALE_HEIGHT, 20);
+        ta.recycle();
+
         mScroller = new Scroller(getContext());
+
+        mRectWidth = (mMax - mMin) * mScaleMargin;
+        mRectHeight = mScaleHeight * 8;
+        mScaleMaxHeight = mScaleHeight * 2;
+
         // 设置layoutParams
         ViewGroup.MarginLayoutParams lp = new ViewGroup.MarginLayoutParams(mRectWidth, mRectHeight);
         this.setLayoutParams(lp);
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        mScaleScrollViewWidth = getMeasuredWidth();
+        mTempScale = mScaleScrollViewWidth / mScaleMargin / 2 + mMin;
+        mMidCountScale = mScaleScrollViewWidth / mScaleMargin / 2 + mMin;
+
     }
 
     /**
@@ -136,7 +167,7 @@ public class HorizontalScaleScrollView extends View {
                 mTempScale = mCountScale;
                 return true;
             case MotionEvent.ACTION_UP:
-                if (mCountScale < 0) mCountScale = 0;
+                if (mCountScale < mMin) mCountScale = mMin;
                 if (mCountScale > mMax) mCountScale = mMax;
                 int finalX = (mCountScale - mMidCountScale) * mScaleMargin;
                 mScroller.setFinalX(finalX); //纠正指针位置
@@ -156,11 +187,12 @@ public class HorizontalScaleScrollView extends View {
         // 设定是否使用图像抖动处理，会使绘制出来的图片颜色更加平滑和饱满，图像更加清晰
         mPaint.setDither(true);
         mPaint.setTextSize(mRectHeight / 4);
-        for (int i = mMin; i <= mMax; i++) {
+        for (int i = 0, k = mMin; i <= mMax - mMin; i++) {
             if (i % 10 == 0) { //整值
                 canvas.drawLine(i * mScaleMargin, mRectHeight, i * mScaleMargin, mRectHeight - mScaleMaxHeight, mPaint);
                 //整值文字
-                canvas.drawText(String.valueOf(i), i * mScaleMargin, mRectHeight - mScaleMaxHeight - 10, mPaint);
+                canvas.drawText(String.valueOf(k), i * mScaleMargin, mRectHeight - mScaleMaxHeight - 20, mPaint);
+                k += 10;
             } else {
                 canvas.drawLine(i * mScaleMargin, mRectHeight, i * mScaleMargin, mRectHeight - mScaleHeight, mPaint);
             }
@@ -178,13 +210,13 @@ public class HorizontalScaleScrollView extends View {
         // 设定是否使用图像抖动处理，会使绘制出来的图片颜色更加平滑和饱满，图像更加清晰
 //        mPaint.setDither(true);
         //每一屏幕刻度的个数/2
-        int countScale = mScreenWidth / mScaleMargin / 2;
+        int countScale = mScaleScrollViewWidth / mScaleMargin / 2;
         //根据滑动的距离，计算指针的位置【指针始终位于屏幕中间】
         int finalX = mScroller.getFinalX();
         //滑动的刻度
         int tmpCountScale = (int) Math.rint((double) finalX / (double) mScaleMargin); //四舍五入取整
         //总刻度
-        mCountScale = tmpCountScale + countScale;
+        mCountScale = tmpCountScale + countScale + mMin;
         if (mScrollListener != null) { //回调方法
             mScrollListener.onScaleScroll(mCountScale);
         }
@@ -206,17 +238,6 @@ public class HorizontalScaleScrollView extends View {
             // 通过重绘来不断调用computeScroll
             invalidate();
         }
-    }
-
-    /**
-     * 获取屏幕宽度 ----- px
-     *
-     * @return
-     */
-    private int getPhoneWidth() {
-        DisplayMetrics dm = new DisplayMetrics();
-        ((Activity) getContext()).getWindowManager().getDefaultDisplay().getMetrics(dm);
-        return dm.widthPixels;
     }
 
     public void smoothScrollBy(int dx, int dy) {
