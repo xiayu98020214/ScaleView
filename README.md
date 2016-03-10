@@ -1,6 +1,7 @@
 ScaleScrollView
 ======
  一个动态Draw的滚动刻度尺，目前仅支持水平滚动。
+ 
  ![](./images/scale.gif)
  
 Usage
