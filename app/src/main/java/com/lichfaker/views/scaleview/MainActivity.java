@@ -5,10 +5,12 @@ import android.os.Bundle;
 import android.widget.TextView;
 
 import com.lichfaker.scaleview.HorizontalScaleScrollView;
+import com.lichfaker.scaleview.VerticalScaleScrollView;
 
 public class MainActivity extends AppCompatActivity {
 
     TextView mTvHorizontalScale;
+    TextView mTvVerticalScale;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,6 +24,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onScaleScroll(int scale) {
                 mTvHorizontalScale.setText("" + scale);
+            }
+        });
+
+        mTvVerticalScale = (TextView) findViewById(R.id.verticalScaleValue);
+
+        VerticalScaleScrollView vScaleScrollView = (VerticalScaleScrollView) findViewById(R.id.verticalScale);
+        vScaleScrollView.setOnScrollListener(new HorizontalScaleScrollView.OnScrollListener() {
+            @Override
+            public void onScaleScroll(int scale) {
+                mTvVerticalScale.setText("" + scale);
             }
         });
     }

@@ -31,4 +31,25 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
+    <com.lichfaker.scaleview.VerticalScaleScrollView
+        android:id="@+id/verticalScale"
+        android:layout_below="@+id/horizontalScale"
+        android:layout_marginTop="60dp"
+        app:scale_view_max="200"
+        app:scale_view_min="20"
+        app:scale_view_height="8dip"
+        app:scale_view_margin="5dip"
+        android:layout_width="100dp"
+        android:layout_height="200dp" />
+
+    <TextView
+        android:id="@+id/verticalScaleValue"
+        android:layout_toRightOf="@+id/verticalScale"
+        android:layout_centerInParent="true"
+        android:layout_marginLeft="60dp"
+        tools:text="50"
+        android:textSize="16sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
 </RelativeLayout>
