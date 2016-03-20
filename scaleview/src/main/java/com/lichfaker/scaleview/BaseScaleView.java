@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Build;
+import android.support.annotation.StyleableRes;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.Scroller;
@@ -18,16 +19,16 @@ import android.widget.Scroller;
 public abstract class BaseScaleView extends View {
 
     public static final int[] ATTR = {
-            R.attr.scale_view_min,
-            R.attr.scale_view_max,
-            R.attr.scale_view_margin,
-            R.attr.scale_view_height,
+            R.attr.lf_scale_view_min,
+            R.attr.lf_scale_view_max,
+            R.attr.lf_scale_view_margin,
+            R.attr.lf_scale_view_height,
     };
 
-    public static final int SCALE_MIN = 0;
-    public static final int SCALE_MAX = 1;
-    public static final int SCALE_MARGIN = 2;
-    public static final int SCALE_HEIGHT = 3;
+    public static final @StyleableRes int LF_SCALE_MIN = 0;
+    public static final @StyleableRes int LF_SCALE_MAX = 1;
+    public static final @StyleableRes int LF_SCALE_MARGIN = 2;
+    public static final @StyleableRes int LF_SCALE_HEIGHT = 3;
 
     protected int mMax; //最大刻度
     protected int mMin; // 最小刻度
@@ -78,10 +79,10 @@ public abstract class BaseScaleView extends View {
     protected void init(AttributeSet attrs) {
         // 获取自定义属性
         TypedArray ta = getContext().obtainStyledAttributes(attrs, ATTR);
-        mMin = ta.getInteger(SCALE_MIN, 0);
-        mMax = ta.getInteger(SCALE_MAX, 200);
-        mScaleMargin = ta.getDimensionPixelOffset(SCALE_MARGIN, 15);
-        mScaleHeight = ta.getDimensionPixelOffset(SCALE_HEIGHT, 20);
+        mMin = ta.getInteger(LF_SCALE_MIN, 0);
+        mMax = ta.getInteger(LF_SCALE_MAX, 200);
+        mScaleMargin = ta.getDimensionPixelOffset(LF_SCALE_MARGIN, 15);
+        mScaleHeight = ta.getDimensionPixelOffset(LF_SCALE_HEIGHT, 20);
         ta.recycle();
 
         mScroller = new Scroller(getContext());
