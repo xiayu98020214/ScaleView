@@ -95,6 +95,14 @@ public class HorizontalScaleScrollView extends BaseScaleView {
                 countScale * mScaleMargin + finalX, mRectHeight - mScaleMaxHeight - mScaleHeight, paint);
     }
 
+    @Override
+    public void scrollToScale(int val) {
+        if (val < mMin || val > mMax) {
+            return;
+        }
+        int dx = (val - mCountScale) * mScaleMargin;
+        smoothScrollBy(dx, 0);
+    }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {

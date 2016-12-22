@@ -29,6 +29,7 @@ public abstract class BaseScaleView extends View {
     public static final @StyleableRes int LF_SCALE_MAX = 1;
     public static final @StyleableRes int LF_SCALE_MARGIN = 2;
     public static final @StyleableRes int LF_SCALE_HEIGHT = 3;
+    public static final @StyleableRes int LF_SCALE_CURRENT = 4;
 
     protected int mMax; //最大刻度
     protected int mMin; // 最小刻度
@@ -121,6 +122,16 @@ public abstract class BaseScaleView extends View {
 
     // 画指针
     protected abstract void onDrawPointer(Canvas canvas, Paint paint);
+
+    // 滑动到指定刻度
+    public abstract void scrollToScale(int val);
+
+    public void setCurScale(int val) {
+        if (val >= mMin && val <= mMax) {
+            scrollToScale(val);
+            postInvalidate();
+        }
+    }
 
     /**
      * 使用Scroller时需重写

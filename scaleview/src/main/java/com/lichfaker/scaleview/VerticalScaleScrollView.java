@@ -96,6 +96,15 @@ public class VerticalScaleScrollView extends BaseScaleView {
     }
 
     @Override
+    public void scrollToScale(int val) {
+        if (val < mMin || val > mMax) {
+            return;
+        }
+        int dy = (val - mCountScale) * mScaleMargin;
+        smoothScrollBy(0, dy);
+    }
+
+    @Override
     public boolean onTouchEvent(MotionEvent event) {
         int y = (int) event.getY();
         switch (event.getAction()) {

@@ -1,7 +1,9 @@
 package com.lichfaker.views.scaleview;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.lichfaker.scaleview.HorizontalScaleScrollView;
@@ -9,21 +11,30 @@ import com.lichfaker.scaleview.VerticalScaleScrollView;
 
 public class MainActivity extends AppCompatActivity {
 
-    TextView mTvHorizontalScale;
+    EditText mTvHorizontalScale;
     TextView mTvVerticalScale;
+    HorizontalScaleScrollView scaleScrollView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mTvHorizontalScale = (TextView) findViewById(R.id.horizontalScaleValue);
+        mTvHorizontalScale = (EditText) findViewById(R.id.horizontalScaleValue);
 
-        HorizontalScaleScrollView scaleScrollView = (HorizontalScaleScrollView) findViewById(R.id.horizontalScale);
+        scaleScrollView = (HorizontalScaleScrollView) findViewById(R.id.horizontalScale);
         scaleScrollView.setOnScrollListener(new HorizontalScaleScrollView.OnScrollListener() {
             @Override
             public void onScaleScroll(int scale) {
                 mTvHorizontalScale.setText("" + scale);
+            }
+        });
+
+        findViewById(R.id.horizontalScaleValueBtn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String valStr = mTvHorizontalScale.getText().toString().trim();
+                scaleScrollView.setCurScale(Integer.parseInt(valStr));
             }
         });
 
